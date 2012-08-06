@@ -4,7 +4,6 @@ use utf8;
 use FindBin::libs;
 package TemplateEngine;
 
-# htmlファイルパスから中身を呼び出す
 sub new {
 	my $class=shift;
 	shift;
@@ -12,31 +11,27 @@ sub new {
 	bless  {dir => $dir}, $class;
 }
 
-# html書き換えて出力
 sub render {
 	my ($name, $hash) = @_;
-	my %hash = %$hash;	# ハッシュをデリファレンス
-	my $dir= ${$name}{dir};
-	my $title = $hash{'title'};
-	my $content = $hash{'content'};
-	
-	#展開
-	open( FH, "<:utf8", $dir) or die;
+	my $dir= ${$name}{dir};  			#ディレクトリの取得
+	my %hash = %$hash;					#引数をデリファレンス
+	my $title = $hash{'title'};			
+	my $content = $hash{'content'};	 
+		
+	open( FH, "<:utf8", $dir) or die;	#htmlファイルの読み込み
 	my @html = <FH>;
 	close (FH);
-	
-	# ループさせてhtml書き換え
-	foreach my $line (@html){
+
+	for my $line (@html){				# htmlの改編
 		if ($line =~/title/)
 			{
 				$line =~s/{% title %}/$title/;
 			}
 		elsif ($line =~/content/)
 			{
-			$line =~s/{% content %}/$content/;
+				$line =~s/{% content %}/$content/;
 			}
 	}
-# output.htmlを出力
-return @html;
+return @html;							# 結果を出力
 }
 1;

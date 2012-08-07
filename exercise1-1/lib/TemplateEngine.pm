@@ -26,6 +26,6 @@ sub render {
 			$line =~ s/{% title %}/$title/g;
 			$line =~ s/{% content %}/$content/g;
 	}
-return @html;							# 結果を出力
+	return @html;						# 結果を出力
 }
 1;

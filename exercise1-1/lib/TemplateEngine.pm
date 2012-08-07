@@ -23,14 +23,8 @@ sub render {
 	close (FH);
 
 	for my $line (@html){				# htmlの改編
-		if ($line =~/title/)
-			{
-				$line =~s/{% title %}/$title/;
-			}
-		elsif ($line =~/content/)
-			{
-				$line =~s/{% content %}/$content/;
-			}
+			$line =~ s/{% title %}/$title/g;
+			$line =~ s/{% content %}/$content/g;
 	}
 return @html;							# 結果を出力
 }

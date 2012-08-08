@@ -7,7 +7,8 @@ var Template = function(input) {
 
 Template.prototype = {
     render: function(variables) {
-      this.h1=variables['title'];
+	escape(variables);		
+    this.h1=variables['title'];
 	this.h2=variables['content'];
 	this.src=this.src.replace(/{% title %}/,this.h1);	
 	this.src=this.src.replace(/{% content %}/,this.h2);
@@ -21,8 +22,6 @@ function change(form_input) {
 	 this.content=form_input.content.value;
 	 part=part.replace(/{% title %}/,this.title);
 	 part=part.replace(/{% content %}/,this.content);
-	 //document.getElementById('in').innerHTML="";
-	// console.log(document.getElementById('in'));
 	 delete_obj('in');
 	 document.getElementById('result').innerHTML+=part+form;
 };
@@ -31,3 +30,11 @@ function delete_obj( id ){
     var obj=document.getElementById(id);
     obj.parentNode.removeChild(obj);
 };
+function escape(hash) {
+	for (var i in hash) {
+		hash[i]=hash[i].replace(/&/,"&amp");
+		hash[i]=hash[i].replace(/>/,"$gt");
+		hash[i]=hash[i].replace(/</,"&lt");
+		hash[i]=hash[i].replace(/"/,"&quot");
+	};
+}

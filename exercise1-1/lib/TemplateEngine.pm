@@ -1,41 +1,37 @@
 use strict;
 use warnings;
-use utf8;
-use FindBin::libs;
+use UTF8;
+use HTML::Entities;
+use IO::File;
 package TemplateEngine;
 
+binmode(STDOUT, ":utf8"); #wide char問題対策
 sub new {
-	my $class=shift;
-	shift;
-	my $dir=shift;
-	bless  \$dir, $class;
+	my($class,%values)=@_;
+	my $dir=$values{file};
+	bless \$dir,$class;
 }
 
 sub render {
-	my ($name, $hash) = @_;
-	my $dir = ${$_[0]};					#ディレクトリの取得
-	my %hash = %$hash;					#引数をデリファレンス
-	my $title = escape($hash{'title'});			
-	my $content = escape($hash{'content'});
-	my $db;
-		
-	open( FH, "<:utf8", $dir) or die("can't find file");	#htmlファイルの読み込み
-	my @html = <FH>;
-	close (FH);
-
-	for my $line (@html){				# htmlの改編
-			$line =~ s/{% title %}/$title/g;
-			$line =~ s/{% content %}/$content/g;
-			$db=$db.$line;
+	my $out='';
+	my($dir,$values)=@_;
+	$values=escape($values);
+	my %values=%$values;	
+	$dir= ${$dir};		#ディレクトリのデリファレンス
+	my $io=IO::File->new($dir,'<') or die;
+	my @lines= $io->getlines; #ファイルから全行を取得
+	for my $line (@lines){
+		$line=~ s/{%\s*(\w+)\s*%}/$values{$1}/g; #テンプレートを置換
+		$out.=$line; #出力用のスカラー値に追加
 	}
-	return $db;						# 結果を出力
+	return $out;
 }
+
 sub escape {
-	my $str=$_[0];
-	$str=~ s/&/&amp;/g;
-	$str=~ s/>/&gt;/g;
-	$str=~ s/</&lt;/g;
-	$str=~ s/"/&quot;/g;
-	return $str;
+	my %hash= %{$_[0]}; #hash値のデリファレンス
+	for my $key (keys %hash){
+		$hash{$key}=HTML::Entities::encode_entities($hash{$key},qw(&<>"'));
+	}
+	return \%hash;
 }
 1;
